@@ -15,7 +15,6 @@ description: 'Testing JS Jobs'
 #       shell: bash
 
 runs:
-  build:
 
     runs-on: ubuntu-latest
 
