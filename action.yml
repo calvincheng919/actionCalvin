@@ -1,32 +1,35 @@
-name: 'Hello World by Calvin'
-description: 'Testing JS Jobs'
+name: Marketplace Automation Tests
 
-# runs:
-#   using: "composite"
-#   steps:
-#     - run: echo Hello ${{ inputs.who-to-greet }}.
-#       shell: bash
-#     - id: random-number-generator
-#       run: echo "::set-output name=random-number::$(echo $RANDOM)"
-#       shell: bash
-#     - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
-#       shell: bash          
-#     - run: goodbye.sh
-#       shell: bash
+description: 'Marketplace Automation Tests'
 
 runs:
+  using: "composite"
+  steps: 
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm i ajv
+      shell: bash
+    - run: npm install jest --global
+      shell: bash
+    - run: npm i jest-junit
+      shell: bash
+    - run: npm i lookml-parser
+      shell: bash
+    - run: npm i find-duplicated-property-keys
+      shell: bash
+    - name: checkout
+      uses: actions/checkout@v3 
+    - run: jest marketplace.spec.js --config=jest.config.js --ci --reporters=default --reporters=jest-junit
+      shell: bash
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()    # run this step even if previous step failed
+      with:
+        # working-directory: ./.github/workflows/marketplace_tests
+        name: JEST Tests            # Name of the check run which will be created
+        path: junit.xml             # Path to test results           path: reports/jest-*.xml    
+        reporter: jest-junit        # Format of test results
 
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [16.x]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: node test.js
-        working-directory: ./.github/workflows
